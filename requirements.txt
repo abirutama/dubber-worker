@@ -1,19 +1,20 @@
-# Runpod serverless runtime
 runpod==1.7.0
 
-# Pin PyTorch to <2.6 to avoid weights_only default change breaking XTTS checkpoints
+# Torch pinned <2.6 to avoid weights_only default break with XTTS checkpoints
 torch==2.5.1
 torchvision==0.20.1
 torchaudio==2.5.1
 
-# Coqui TTS (XTTS v2)
-TTS
+# Coqui TTS
+TTS==0.22.0
 
-# Common deps (aman untuk serverless audio pipeline)
+# Audio/runtime utils
 numpy
 scipy
 soundfile
+librosa
 pydub
 ffmpeg-python
 requests
 tqdm
+python-dotenv
