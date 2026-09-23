@@ -1,40 +1,26 @@
-FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    XDG_CACHE_HOME=/app/.cache \
-    HF_HOME=/app/.cache/huggingface \
-    TRANSFORMERS_CACHE=/app/.cache/huggingface/transformers
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV HF_HOME=/app/models
+
+RUN apt-get update && apt-get install -y \
+    python3-pip python3-dev ffmpeg libsndfile1 git build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.11 python3.11-venv python3-pip \
-    git ffmpeg ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+RUN python3 -m pip install --upgrade pip
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
-RUN python3.11 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# Install F5-TTS, Faster-Whisper, CTranslate2, dan Dep terkait
+RUN pip3 install runpod faster-whisper ctranslate2 transformers sentencepiece boto3 pydub
+RUN pip3 install git+https://github.com/SWIRL-AI/F5-TTS.git
 
-# ensure pkg_resources exists (setuptools)
-RUN pip install --upgrade pip setuptools wheel
-
-COPY requirements.txt /app/requirements.txt
-RUN pip install -r /app/requirements.txt
-
-# Auto-accept Coqui TOS prompt (non-interactive)
-COPY patches/auto_accept_coqui_tos.py /app/patches/auto_accept_coqui_tos.py
-RUN python /app/patches/auto_accept_coqui_tos.py
-
-# (Optional) Pre-warm caches at build time.
-# Comment these out if you want faster builds.
-# 1) XTTS v2 download
-RUN python -c "from TTS.api import TTS; TTS('tts_models/multilingual/multi-dataset/xtts_v2')"
-# 2) NLLB model download
-RUN python -c "from transformers import AutoTokenizer, AutoModelForSeq2SeqLM; m='facebook/nllb-200-distilled-600M'; AutoTokenizer.from_pretrained(m); AutoModelForSeq2SeqLM.from_pretrained(m)"
+# Bake Model Whisper & NLLB saat Docker Build
+RUN python3 -c "from faster_whisper import WhisperModel; WhisperModel('large-v3', device='cpu', compute_type='int8')"
+RUN python3 -c "from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('facebook/nllb-200-distilled-1.3B')"
 
 COPY handler.py /app/handler.py
 
-CMD ["python", "-u", "handler.py"]
+CMD [ "python3", "-u", "/app/handler.py" ]
