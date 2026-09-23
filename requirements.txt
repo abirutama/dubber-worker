@@ -1,10 +1,11 @@
 runpod==1.7.0
 
-# Keep torch < 2.6 to avoid weights_only default breaking XTTS checkpoints
+# IMPORTANT: keep torch < 2.6 (fixes XTTS checkpoint load error)
 torch==2.5.1
 torchvision==0.20.1
 torchaudio==2.5.1
 
+# Coqui TTS
 TTS==0.22.0
 
 numpy

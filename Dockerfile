@@ -16,13 +16,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python3.11 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# pkg_resources lives in setuptools; ensure it's present
+# ensure pkg_resources exists (setuptools)
 RUN pip install --upgrade pip setuptools wheel
 
 COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
 
-# Auto-accept Coqui TOS prompt (non-interactive build/serverless)
+# Patch Coqui TTS: auto-accept TOS prompt (non-interactive)
 COPY patches/auto_accept_coqui_tos.py /app/patches/auto_accept_coqui_tos.py
 RUN python /app/patches/auto_accept_coqui_tos.py
 
