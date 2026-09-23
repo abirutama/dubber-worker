@@ -10,6 +10,7 @@ import runpod
 from faster_whisper import WhisperModel
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from TTS.api import TTS
+import builtins
 
 
 def run(cmd: list[str]) -> None:
@@ -108,9 +109,16 @@ def get_nllb():
 def get_xtts():
     global _XTTS
     if _XTTS is None:
-        _XTTS = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
-        if os.environ.get("CUDA_VISIBLE_DEVICES"):
-            _XTTS = _XTTS.to("cuda")
+        # Coqui TTS may prompt for Terms of Service via input().
+        # Serverless workers have no stdin, so we must bypass the prompt.
+        orig_input = builtins.input
+        builtins.input = lambda *args, **kwargs: "y"
+        try:
+            _XTTS = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
+            if os.environ.get("CUDA_VISIBLE_DEVICES"):
+                _XTTS = _XTTS.to("cuda")
+        finally:
+            builtins.input = orig_input
     return _XTTS
 
 
