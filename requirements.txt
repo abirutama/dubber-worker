@@ -1,14 +1,24 @@
+# Core
 runpod==1.7.0
+requests==2.32.3
+pydub==0.25.1
+
+# R2 upload
 boto3==1.34.162
 botocore==1.34.162
 
-faster-whisper==1.0.3
+# Pin numeric stack to avoid scipy/numpy ABI mismatch
+numpy==2.1.3
+scipy==1.14.1
 
+# ASR
+faster-whisper==1.0.3
+ctranslate2==4.4.0
+
+# Translation (NLLB)
 transformers==4.44.2
 sentencepiece==0.2.0
 sacremoses==0.1.1
 
+# TTS (XTTS-v2)
 TTS==0.22.0
-
-pydub==0.25.1
-requests==2.32.3
