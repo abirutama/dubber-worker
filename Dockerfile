@@ -15,7 +15,7 @@ RUN pip3 install torch torchvision torchaudio --index-url https://download.pytor
 
 # Install F5-TTS, Faster-Whisper, CTranslate2, dan Dep terkait
 RUN pip3 install runpod faster-whisper ctranslate2 transformers sentencepiece boto3 pydub
-RUN pip3 install git+https://github.com/SWIRL-AI/F5-TTS.git
+RUN pip3 install git+https://github.com/SWaiB/F5-TTS.git
 
 # Bake Model Whisper & NLLB saat Docker Build
 RUN python3 -c "from faster_whisper import WhisperModel; WhisperModel('large-v3', device='cpu', compute_type='int8')"
