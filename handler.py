@@ -8,6 +8,7 @@ _XTTS = None
 def get_xtts():
     global _XTTS
     if _XTTS is None:
+        # NOTE: first run may trigger TOS prompt inside TTS download path.
         _XTTS = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
     return _XTTS
 
