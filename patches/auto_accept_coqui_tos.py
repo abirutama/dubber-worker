@@ -14,14 +14,14 @@ if marker in src:
 
 patch = f"""
 \n{marker}
-# This patch is injected to disable interactive TOS prompts in non-interactive environments.
-# It monkeypatches ModelManager methods without modifying existing class/method structure.
+# Injected to disable interactive Coqui TOS prompts in non-interactive environments (Docker build / serverless).
+# By proceeding, you assert you have a commercial license or agree to CPML terms:
+# https://coqui.ai/cpml
 
 def _runpod_always_true(*args, **kwargs):
     return True
 
 try:
-    # ModelManager is defined in this module; overwrite both variants used across versions.
     ModelManager.ask_tos = _runpod_always_true
     ModelManager.tos_agreed = _runpod_always_true
 except Exception as e:
