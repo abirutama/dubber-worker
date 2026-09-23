@@ -8,6 +8,10 @@ torchaudio==2.5.1
 # Coqui TTS
 TTS==0.22.0
 
+# FIX: transformers 5.x breaks XTTS import (BeamSearchScorer missing)
+transformers==4.41.2
+tokenizers==0.19.1
+
 numpy
 scipy
 soundfile
