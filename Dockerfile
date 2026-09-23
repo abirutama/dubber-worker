@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
@@ -19,10 +19,10 @@ WORKDIR /app
 # 2. Upgrade pip
 RUN python3 -m pip install --upgrade pip
 
-# 3. Install PyTorch dengan CUDA 12.1 (Stabil di GPU RunPod)
-RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# 3. Install PyTorch >= 2.6.0 dengan CUDA 12.4 (Memenuhi syarat keamanan CVE-2025-32434)
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
 
-# 4. Install All Python Packages dari PyPI
+# 4. Install Python Packages dari PyPI
 RUN pip3 install \
     runpod \
     faster-whisper \
@@ -33,7 +33,7 @@ RUN pip3 install \
     pydub \
     f5-tts
 
-# 5. Bake Weights Model ke Image saat Build (Bebas Cold-Start saat Runtime)
+# 5. Bake Weights Model ke Image saat Build
 RUN python3 -c "from faster_whisper import WhisperModel; WhisperModel('large-v3', device='cpu', compute_type='int8')"
 RUN python3 -c "from transformers import AutoTokenizer, AutoModelForSeq2SeqLM; AutoTokenizer.from_pretrained('facebook/nllb-200-distilled-1.3B'); AutoModelForSeq2SeqLM.from_pretrained('facebook/nllb-200-distilled-1.3B')"
 
